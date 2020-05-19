@@ -3,6 +3,9 @@ using UnityEngine.UI;
 using UnityEngine.Networking;  // 引用 網路連線 API
 using System.Collections;
 
+/// <summary>
+/// 取得卡牌資料並顯示卡牌圖鑑
+/// </summary>
 public class GetCard : MonoBehaviour
 {
     public CardData[] cards;
@@ -15,6 +18,15 @@ public class GetCard : MonoBehaviour
     private CanvasGroup loadingPanel;
     private Image loading;
 
+    /// <summary>
+    /// 取得卡牌資料的實體物件
+    /// </summary>
+    public static GetCard instance;
+
+    /// <summary>
+    /// 利用 GAS 取得卡牌資料
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator GetCardData()
     {
         loadingPanel.alpha = 1;                 // 顯示
@@ -74,11 +86,16 @@ public class GetCard : MonoBehaviour
             temp.Find("描述").GetComponent<Text>().text = card.description;
             // 尋找圖片子物件.圖片 = 來源.載入<圖片>(檔案名稱)
             temp.Find("遮色片").Find("圖片").GetComponent<Image>().sprite = Resources.Load<Sprite>(card.file);
+
+            // 添加元件 <圖鑑卡牌> 編號 = 卡牌.編號
+            temp.gameObject.AddComponent<BookCard>().index = card.index;
         }
     }
 
     private void Awake()
     {
+        instance = this;
+        
         loadingPanel = GameObject.Find("載入畫面").GetComponent<CanvasGroup>();
         loading = GameObject.Find("進度條").GetComponent<Image>();
     }
