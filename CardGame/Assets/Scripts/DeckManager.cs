@@ -45,16 +45,29 @@ public class DeckManager : MonoBehaviour
             {
                 // 牌組.增加(取得卡牌.實體物件.卡牌資料[編號])
                 deck.Add(GetCard.instance.cards[index - 1]);
-                // 生成 牌組卡牌資訊物件 到 牌組內容
-                Transform temp = Instantiate(DeckObject, contentDeck).transform;
+
+                // 取得卡牌資訊
+                CardData card = GetCard.instance.cards[index - 1];
+
+                Transform temp;
+
+                if (sameCard.Count < 1)
+                {
+                    // 生成 牌組卡牌資訊物件 到 牌組內容
+                    temp = Instantiate(DeckObject, contentDeck).transform;
+                    temp.name = "牌組卡牌資訊 : " + card.name;
+                }
+                else
+                {
+                    temp = GameObject.Find("牌組卡牌資訊 : " + card.name).transform;
+                }
 
                 // 更新卡牌數量
                 textDeckCount.text = "卡牌數量 :" + deck.Count + " / 30";
-                // 取得卡牌資訊
-                CardData card = GetCard.instance.cards[index - 1];
                 // 更新牌組卡牌資訊
                 temp.Find("消耗").GetComponent<Text>().text = card.cost.ToString();
                 temp.Find("名稱").GetComponent<Text>().text = card.name;
+                temp.Find("數量").GetComponent<Text>().text = (sameCard.Count + 1).ToString();
             }            
         }
     }
