@@ -25,8 +25,6 @@ public class BookCard : MonoBehaviour
     /// </summary>
     private void ChooseBookCard()
     {
-        print("選取的圖鑑編號為 :" + index);
-
         DeckManager.instance.AddCard(index);
     }
 }
