@@ -12,6 +12,8 @@ public class DeckManager : MonoBehaviour
     public Text textDeckCount;
     [Header("開始遊戲按鈕")]
     public Button btnStart;
+    [Header("洗牌後牌組")]
+    public Transform tranShuffle;
 
     /// <summary>
     /// 牌組清單
@@ -29,6 +31,8 @@ public class DeckManager : MonoBehaviour
         instance = this;
         // 取消開始遊戲按鈕 互動
         btnStart.interactable = false;
+        // 添加監聽器(開始遊戲)
+        btnStart.onClick.AddListener(StartBattle);
     }
 
     /// <summary>
@@ -117,4 +121,61 @@ public class DeckManager : MonoBehaviour
         // 取消開始遊戲按鈕 互動
         btnStart.interactable = false;
     }
+
+    /// <summary>
+    /// 洗牌
+    /// </summary>
+    private void Shuffle()
+    {
+        // 執行 30 次
+        for (int i = 0; i < deck.Count; i++)
+        {
+            // 儲存目前卡牌
+            CardData original = deck[i];
+
+            // 取得隨機編號 0 - 30
+            int r = Random.Range(0, deck.Count);
+
+            // 目前 = 隨機卡牌
+            deck[i] = deck[r];
+
+            // 隨機卡牌 = 目前
+            deck[r] = original;
+        }
+
+        CreatCard();
+    }
+
+    /// <summary>
+    /// 建立卡牌物件 - 放在洗牌後牌組
+    /// </summary>
+    private void CreatCard()
+    {
+        for (int i = 0; i < deck.Count; i++)
+        {
+            // 變形 = 生成 (物件，父物件).變形
+            Transform temp = Instantiate(GetCard.instance.cardObject, tranShuffle).transform;
+            // 卡片資料
+            CardData card = deck[i];
+            // 尋找子物件並更新文字
+            temp.Find("消耗").GetComponent<Text>().text = card.cost.ToString();
+            temp.Find("攻擊").GetComponent<Text>().text = card.attack.ToString();
+            temp.Find("血量").GetComponent<Text>().text = card.hp.ToString();
+            temp.Find("名稱").GetComponent<Text>().text = card.name;
+            temp.Find("描述").GetComponent<Text>().text = card.description;
+            // 尋找圖片子物件.圖片 = 來源.載入<圖片>(檔案名稱)
+            temp.Find("遮色片").Find("圖片").GetComponent<Image>().sprite = Resources.Load<Sprite>(card.file);
+        }
+    }
+
+    /// <summary>
+    /// 開始遊戲
+    /// </summary>
+    private void StartBattle()
+    {        
+        Shuffle();
+        BattleManager.instance.StartBattle();
+    }
+
+    
 }
