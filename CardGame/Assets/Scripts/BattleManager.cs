@@ -15,6 +15,12 @@ public class BattleManager : MonoBehaviour
     public GameObject gameView;
     [Header("畫布")]
     public Transform canvas;
+    [Header("手牌區域")]
+    public Transform handArea;
+    [Header("水晶"), Tooltip("水晶圖片，用來顯示的 10 張")]
+    public GameObject[] crystalObject;
+    [Header("擲金幣畫面")]
+    public GameObject coinView;
 
     /// <summary>
     /// 先後攻
@@ -22,6 +28,10 @@ public class BattleManager : MonoBehaviour
     /// false 後
     /// </summary>
     private bool firstAttack;
+    /// <summary>
+    /// 水晶數量
+    /// </summary>
+    public int crystal;
 
     [Header("手牌卡牌資訊")]
     /// <summary>
@@ -67,11 +77,35 @@ public class BattleManager : MonoBehaviour
         // 三元運算子
         // 先後攻 = 布林運算 ? 成立 : 不成立
         // 錢號 Y > 0.25f 正面
-        print(coin.transform.GetChild(0).position.y);
+        //print(coin.transform.GetChild(0).position.y);
 
         firstAttack = coin.transform.GetChild(0).position.y  > 0.25f ? true : false;
 
-        StartCoroutine(GetCard(3));
+        coinView.SetActive(false);      // 隱藏金幣畫面
+
+        // 如果 先攻 水晶 1 顆，卡牌 4 張
+        int card = 3;
+
+        if (firstAttack)
+        {
+            crystal = 1;
+            card = 4;
+        }
+
+        Crystal();
+
+        StartCoroutine(GetCard(card));
+    }
+    /// <summary>
+    /// 處理水晶數量
+    /// </summary>
+    private void Crystal()
+    {
+        // 顯示目前有幾顆水晶
+        for (int i = 0; i < crystal; i++)
+        {
+            crystalObject[i].SetActive(true);
+        }
     }
 
     /// <summary>
@@ -94,9 +128,6 @@ public class BattleManager : MonoBehaviour
             yield return StartCoroutine(MoveCard());
         }       
     }
-
-    [Header("手牌區域")]
-    public Transform handArea;
 
     /// <summary>
     /// 顯示卡牌再移動到手上
