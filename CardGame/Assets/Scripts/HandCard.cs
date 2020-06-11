@@ -88,7 +88,7 @@ public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             inScene = true;                                // 是否在場景上 = 是
             transform.SetParent(scene);                    // 父物建設為 : 場地
             BattleManager.instance.crystal -= crystalCost; // 扣掉水晶
-            print(BattleManager.instance.crystal);
+            BattleManager.instance.UpdateCrystal();        // 更新水晶
         }
         else
         {

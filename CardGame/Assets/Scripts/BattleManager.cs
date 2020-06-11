@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -19,20 +20,10 @@ public class BattleManager : MonoBehaviour
     public Transform handArea;
     [Header("水晶"), Tooltip("水晶圖片，用來顯示的 10 張")]
     public GameObject[] crystalObject;
+    [Header("水晶數量介面")]
+    public Text textCrystal;
     [Header("擲金幣畫面")]
     public GameObject coinView;
-
-    /// <summary>
-    /// 先後攻
-    /// true 先
-    /// false 後
-    /// </summary>
-    private bool firstAttack;
-    /// <summary>
-    /// 水晶數量
-    /// </summary>
-    public int crystal;
-
     [Header("手牌卡牌資訊")]
     /// <summary>
     /// 對戰用牌組 : 手牌
@@ -41,9 +32,39 @@ public class BattleManager : MonoBehaviour
     [Header("手牌卡牌遊戲物件")]
     public List<GameObject> handGameObject = new List<GameObject>();
 
+    /// <summary>
+    /// 先後攻
+    /// true 先
+    /// false 後
+    /// </summary>
+    private bool firstAttack;
+
+    private bool myTurn;
+    private int crystalTotal;
+
+    /// <summary>
+    /// 水晶數量
+    /// </summary>
+    public int crystal;
+
     private void Start()
     {
         instance = this;
+    }
+
+    public void EndTurn()
+    {
+        myTurn = false;
+    }
+
+    public void StartTurn()
+    {
+        myTurn = true;
+        crystalTotal++;
+        crystal = crystalTotal;
+        Crystal();
+        StartCoroutine(GetCard(1));
+
     }
 
     /// <summary>
@@ -106,6 +127,23 @@ public class BattleManager : MonoBehaviour
         {
             crystalObject[i].SetActive(true);
         }
+
+        textCrystal.text = crystal + " /10";
+    }
+
+    /// <summary>
+    /// 更新水晶介面與圖片
+    /// </summary>
+    public void UpdateCrystal()
+    {
+        for (int i = 0; i < crystalObject.Length; i++)
+        {
+            if (i < crystal) continue;       // 如果 迴圈編號 < 目前水晶數量 就繼續 (跳過此次)
+
+            crystalObject[i].SetActive(false);
+        }
+
+        textCrystal.text = crystal + " /10";
     }
 
     /// <summary>
