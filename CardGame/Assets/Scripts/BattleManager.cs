@@ -51,16 +51,21 @@ public class BattleManager : MonoBehaviour
     {
         instance = this;
     }
-
+    /// <summary>
+    /// 我方結束
+    /// </summary>
     public void EndTurn()
     {
         myTurn = false;
     }
-
+    /// <summary>
+    /// 對方結束 : 水晶 +1
+    /// </summary>
     public void StartTurn()
     {
         myTurn = true;
         crystalTotal++;
+        crystalTotal = Mathf.Clamp(crystalTotal, 1, 10);   // 夾住最大水晶數量
         crystal = crystalTotal;
         Crystal();
         StartCoroutine(GetCard(1));
@@ -100,7 +105,7 @@ public class BattleManager : MonoBehaviour
         // 錢號 Y > 0.25f 正面
         //print(coin.transform.GetChild(0).position.y);
 
-        firstAttack = coin.transform.GetChild(0).position.y  > 0.25f ? true : false;
+        firstAttack = coin.transform.GetChild(0).position.y > 0.25f ? true : false;
 
         coinView.SetActive(false);      // 隱藏金幣畫面
 
@@ -164,8 +169,13 @@ public class BattleManager : MonoBehaviour
 
             // 等待協程執行結束
             yield return StartCoroutine(MoveCard());
-        }       
+        }
     }
+
+    /// <summary>
+    /// 手牌數量
+    /// </summary>
+    private int handCardCount;
 
     /// <summary>
     /// 顯示卡牌再移動到手上
@@ -173,31 +183,41 @@ public class BattleManager : MonoBehaviour
     /// <returns></returns>
     private IEnumerator MoveCard()
     {
-        RectTransform card = handGameObject[handGameObject.Count -1].GetComponent<RectTransform>();     // 取得手牌最後一張[數量 -1]
+        RectTransform card = handGameObject[handGameObject.Count - 1].GetComponent<RectTransform>();     // 取得手牌最後一張[數量 -1]
 
-        card.SetParent(canvas);                  // 將父物件設為畫布
-        card.anchorMin = Vector2.one * 0.5f;     // 設定中心點
-        card.anchorMax = Vector2.one * 0.5f;     // 設定中心點
+        // 進入右手邊中間位置
+        card.SetParent(canvas);                    // 將父物件設為畫布
+        card.anchorMin = Vector2.one * 0.5f;       // 設定中心點
+        card.anchorMax = Vector2.one * 0.5f;       // 設定中心點
 
-        while (card.anchoredPosition.x > 501)    // 當 X > 500 執行移動
+        while (card.anchoredPosition.x > 501)      // 當 X > 500 執行移動
         {
             card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(500, 0), 0.5f * Time.deltaTime * 50);  // 卡片位置前往 500, 0
 
-            yield return null;                   // 等待一個影格
+            yield return null;                     // 等待一個影格
         }
 
-        yield return new WaitForSeconds(0.35f);
+        yield return new WaitForSeconds(0.35f);    // 停留 0.35秒
 
-        card.localScale = Vector3.one * 0.5f;
-
-        while (card.anchoredPosition.y > -274)    // 當 Y > -275 執行移動
+        if (handCardCount == 10)
         {
-            card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(0, -275), 0.5f * Time.deltaTime * 50);  // 卡片位置前往 500, 0
-
-            yield return null;                   // 等待一個影格
+            print("爆掉手牌");
         }
+        else
+        {
+            // 進入手牌
+            card.localScale = Vector3.one * 0.5f;      // 縮小
 
-        card.SetParent(handArea);                  // 設定父物件為手牌區域
-        card.gameObject.AddComponent<HandCard>();  // 添加手牌腳本 - 可拖拉
+            while (card.anchoredPosition.y > -274)     // 當 Y > -275 執行移動
+            {
+                card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(0, -275), 0.5f * Time.deltaTime * 50);  // 卡片位置前往 500, 0
+
+                yield return null;                     // 等待一個影格
+            }
+
+            card.SetParent(handArea);                  // 設定父物件為手牌區域
+            card.gameObject.AddComponent<HandCard>();  // 添加手牌腳本 - 可拖拉
+            handCardCount++;                           // 手牌數量遞增
+        }
     }
 }
