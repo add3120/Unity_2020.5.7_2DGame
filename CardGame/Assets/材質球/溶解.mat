@@ -35,7 +35,7 @@ Material:
     m_Floats:
     - AlphaClip: 0
     - Boolean_619A7868: 0
-    - Boolean_ECEF120C: 1
+    - Boolean_ECEF120C: 0
     - Switch: 0
     - Vector1_AFE07925: 50
     - Vector1_F1C24073: 0
